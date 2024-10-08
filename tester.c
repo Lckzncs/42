@@ -20,7 +20,31 @@ void ft_putchar_new(unsigned int index, char *c)
     ft_putchar(*c);
 }
 
-int main() {
+// Función para imprimir el contenido de un nodo
+void print_content(void *content)
+{
+    printf("%s\n", (char *)content);
+}
+
+// Función para modificar el contenido de un nodo
+void *modify_content(void *content)
+{
+    char *new_content = ft_strdup("Modified ");
+    ft_strlcat(new_content, (char *)content, ft_strlen(new_content) + ft_strlen((char *)content) + 1);
+    return new_content;
+}
+
+// Función para liberar la memoria de un nodo
+void del(void *content)
+{
+    if (content)
+        free(content); // Liberar el contenido del nodo
+}
+
+
+int main()
+{
+
     // Test ft_isalpha
     // Resultado esperado: 1 0
     printf("ft_isalpha('a'): %d\n", ft_isalpha('a'));
@@ -72,7 +96,7 @@ int main() {
     // Test ft_memmove
 	// Resultado esperado: Brasil
     char src[] = "Brasil";
-    printf("Original: %s\n", src);
+    printf("ft_memmove_original: %s\n", src);
     printf("ft_memmove: %s\n", (char *)ft_memmove(src, src, 1));
 
     // Test ft_strlcpy
@@ -184,10 +208,9 @@ int main() {
 	{
     char *str = "Hola, mundo!";
     char *new_str = ft_strmapi(str, toupper_new);
-    printf("%s\n", new_str);
+    printf("ft_strmapi :%s\n", new_str);
     free(new_str);
 	}
-
 
     // Test ft_striteri con función ft_putchar_new
 	// Resultado esperado: Hola
@@ -212,23 +235,88 @@ int main() {
 	ft_putnbr_fd(123, 1);
 	printf("\n");
 
-    // Test ft_lstnew, ft_lstadd_front, ft_lstsize, ft_lstlast, ft_lstadd_back
-    // Resultado esperado: 3
-    //                     Node 3
-    t_list *head = ft_lstnew("Node 1");
-    ft_lstadd_front(&head, ft_lstnew("Node 2"));
-    ft_lstadd_back(&head, ft_lstnew("Node 3"));
-    printf("ft_lstsize: %d\n", ft_lstsize(head));
-    t_list *last = ft_lstlast(head);
-    printf("ft_lstlast: %s\n", (char *)last->content);
-    
-    // Free the allocated memory for linked list nodes
-    while (head != NULL) {
-        t_list *temp = head;
-        head = head->next;
-        free(temp);
+	printf("LINKED LIST\n");
+
+	t_list *head = NULL;
+	
+    // Test ft_lstnew
+    head = ft_lstnew(ft_strdup("Node 1"));
+    if (head == NULL)
+    {
+        printf("Error: ft_lstnew\n");
+        return 1;
     }
+
+    // Test ft_lstadd_front
+    ft_lstadd_front(&head, ft_lstnew(ft_strdup("Node 2")));
+    if (ft_strncmp(head->content, "Node 2", 6)!= 0)
+	{
+    printf("Error: ft_lstadd_front\n");
+    return 1;
+	}
+
+    // Test ft_lstadd_back
+    ft_lstadd_back(&head, ft_lstnew(ft_strdup("Node 3")));
+	if (ft_strncmp(ft_lstlast(head)->content, "Node 3", 6)!= 0)
+	{
+    printf("Error: ft_lstadd_back\n");
+    return 1;
+	}
+
+    // Test ft_lstsize
+    if (ft_lstsize(head)!= 3)
+    {
+        printf("Error: ft_lstsize\n");
+        return 1;
+    }
+
+    // Test ft_lstlast
+    if (ft_strncmp(ft_lstlast(head)->content, "Node 3", 6)!= 0)
+	{
+    printf("Error: ft_lstlast\n");
+    return 1;
+	}
+
+	// Test ft_lstdelone
+	
+	while (head != NULL)
+	{
+    t_list *temp = head->next;  // Guardar el siguiente nodo antes de eliminar el actual
+    ft_lstdelone(head, del);    // Eliminar el nodo actual
+    head = temp;    // Actualizar el puntero head al siguiente nodo
+	}
+
+	// Verificar que el puntero head sea NULL (todos los nodos eliminados)
+	if (head != NULL)
+	{
+    printf("Error: ft_lstdelone\n");
+    return 1;
+	}
+
+    // Test ft_lstclear
+	ft_lstclear(&head, del);
+	head = NULL;
+	if (head!= NULL)
+	{
+    printf("Error: ft_lstclear\n");
+    return 1;
+	}
+
+    // Test ft_lstiter
+    head = ft_lstnew(ft_strdup("Node 1"));
+    ft_lstadd_front(&head, ft_lstnew(ft_strdup("Node 2")));
+    ft_lstadd_back(&head, ft_lstnew(ft_strdup("Node 3")));
+    ft_lstiter(head, print_content);
+
+    // Test ft_lstmap
+    t_list *mapped_list = ft_lstmap(head, modify_content, del);
+    ft_lstiter(mapped_list, print_content);
+
+    // Liberar memoria
+    ft_lstclear(&head, del);
+    ft_lstclear(&mapped_list, del);
+
+    printf("Todos los tests pasaron correctamente\n");
 
     return 0;
 }
-
