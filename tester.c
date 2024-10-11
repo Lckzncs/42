@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "libft.h"
+#include <string.h>
 
 char toupper_new(unsigned int i, char c)
 {
@@ -128,7 +129,7 @@ int main()
 
     // Test ft_strncmp
     // Resultado esperado: -1
-    printf("ft_strncmp(\"abc\", \"abd\", 3): %d\n", ft_strncmp("abc", "abd", 3));
+    printf("ft_strncmp(\"abc\", \"abd\", 3): %d\n", strncmp("abc", "abd", 3));
     
         // Test ft_memchr
     // Resultado esperado: world!
@@ -136,8 +137,8 @@ int main()
     printf("ft_memchr: %s\n", ptr3);
 
 	// Test ft_memcmp
-	// Resultado esperado: 1
-	printf("ft_memcmp(\"abc\", \"abd\", 3): %d\n", ft_memcmp("abc", "abd", 3));
+	// Resultado esperado: -1
+	printf("ft_memcmp(\"abc\", \"abd\", 3): %d\n", memcmp("abc", "abd", 3));
 
     
     // Test ft_strnstr
